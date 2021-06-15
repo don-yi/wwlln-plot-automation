@@ -1,0 +1,29 @@
+aid_type: BEST
+bounding_box:
+  image_height: 1400
+  image_width: 1400
+  maxlat: -11.60497403967373
+  maxlon: 79.99502596032629
+  minlat: -24.19502596032627
+  minlon: 67.40497403967373
+  pixel_height_m: 1000.0
+  pixel_width_m: 1000.0
+  proj4_string: +proj=eqc +lat_ts=0 +lat_0=-17.9 +lon_0=73.7 +x_0=0 +y_0=0 +R=6371228
+    +units=m +no_defs +type=crs
+clat: -17.9
+clon: 73.7
+deck_line: SH,24,2021031112,,BEST,0,-17.9,73.7,125,937,TY,34,NEQ,55,65,80,50,50,NEQ,35,40,40,30,64,NEQ,20,25,20,15,1007,170,15,,20,S,,,,,HABANA,D,,,,,,
+final_storm_name: HABANA
+invest_number: 90
+original_source_filename: 1B.GPM.GMI.TB2016.20210311-S174519-E175017.V05A.RT-H5
+parser_name: gdeck_parser
+pressure: 937.0
+product_filename: https://www.nrlmry.navy.mil/tcdat/tc2021/SH/SH242021/png/89pct/GPM/20210311_174019_SH242021_gmi_GPM_89pct_125kts_7p50_1p0.png
+source_filename: /gpfs/fs1/satuser/geoips_outdirs/satops/longterm_files/atcf/decks/Gsh242021.dat
+source_sector_file: /gpfs/fs1/satuser/geoips_outdirs/satops/longterm_files/atcf/decks/Gsh242021.dat
+storm_basin: SH
+storm_name: HABANA
+storm_num: 24
+storm_year: 2021
+synoptic_time: 2021-03-11 12:00:00
+vmax: 125.0
