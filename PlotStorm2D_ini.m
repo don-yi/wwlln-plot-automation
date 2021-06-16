@@ -11,4 +11,4 @@ dirWwlln = 'data-files-dir/wwlln/';
 outPath  = 'out/';
 outFname = 'test-out-2D';
 
-PlotStorm2D( fnameInfo, dir1C, dir2A, dirWwlln, outPath, outFname )
+PlotStorm2D( fnameInfo, dir1C, dirWwlln, outPath, outFname )

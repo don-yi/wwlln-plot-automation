@@ -1,4 +1,4 @@
-function PlotStorm2D( fnameInfo, dir1C, dir2A, dirWwlln, outPath, outFname )
+function PlotStorm2D( fnameInfo, dir1C, dirWwlln, outPath, outFname )
 
     %% read plot info from sector info file
     % ref below link to download YAMLMATLAB & add to path
@@ -22,7 +22,20 @@ function PlotStorm2D( fnameInfo, dir1C, dir2A, dirWwlln, outPath, outFname )
     timeTo   = passtimeDN + twoMinDN;
 
     % name for title
+    sBasin = infoStruct.storm_basin;
+    sNum = string(infoStruct.storm_num);
     sName = infoStruct.storm_name;
+    synopticTime = datestr(infoStruct.synoptic_time, 'yyyy-mm-dd HH:MM:ss');
+    passtimeDateStr = datestr(passtimeDN, 'yyyy-mm-dd HH:MM:ss');
+
+    % passtimeTitle1 = insertAfter(passtimeSubstr,[4,6],'-');
+    % newStr = insertAfter(str,[5;4],[" Clerk";" Friedrich"])
+    % newStr = insertAfter(str,5," Clerk")
+    % newChr = strrep(chr,'quick','sly')
+
+    % passtimeDateTime = datetime(passtimeSubstr, ...
+    %                             'InputFormat', 'yyyymmdd_HHMMss');
+    % passtimeDateStr = datestr(passtimeDateTime, 'yyyy-mm-dd HH:MM:ss');
 
     %%
     % world map and label
@@ -58,7 +71,7 @@ function PlotStorm2D( fnameInfo, dir1C, dir2A, dirWwlln, outPath, outFname )
 
 
     %%
-    % 2D 89V plot
+    % 2D pct plot
 
     [fname1C,fname1C2] = FindSatelliteFname(dir1C, timeFrom, timeTo);
 
@@ -69,19 +82,19 @@ function PlotStorm2D( fnameInfo, dir1C, dir2A, dirWwlln, outPath, outFname )
     maxlon = cCoord(2) + 16;
     plotRange = [minlat,maxlat,minlon,maxlon];
 
-    [lat_inRange,lon_inRange,tc89V] = GetPlotInfo(fname1C, plotRange);
+    [lat_inRange,lon_inRange,pct89] = GetPlotInfo(fname1C, plotRange);
     % if data is extended to next file
     if fname1C2
-        [lat_inRange2,lon_inRange2,tc89V2] = GetPlotInfo(fname1C2, plotRange);
+        [lat_inRange2,lon_inRange2,pct89_2] = GetPlotInfo(fname1C2, plotRange);
 
         % merge two data
         lat_inRange = horzcat(lat_inRange,lat_inRange2);
         lon_inRange = horzcat(lon_inRange,lon_inRange2);
-        tc89V = horzcat(tc89V,tc89V2);
+        pct89 = horzcat(pct89,pct89_2);
     end
 
     % plot 1C w/ data found
-    pcolorCentered_old(lon_inRange,lat_inRange,tc89V);
+    pcolorCentered_old(lon_inRange,lat_inRange,pct89);
 
 
     %%
@@ -107,7 +120,7 @@ function PlotStorm2D( fnameInfo, dir1C, dir2A, dirWwlln, outPath, outFname )
     h=colorbar('Location','southoutside', ...
         'Position',[0.15 0.1 0.7 0.02]);% add colorbar, save its handle
     h.XAxisLocation = 'bottom';
-    xlabel(h,'89V GHz (Tb)','HorizontalAlignment','center');
+    xlabel(h,'TB (K)','HorizontalAlignment','center');
 
     % Set current back to the main one (done manually so that the other
     % properties such as visibility are not affected).
@@ -188,7 +201,11 @@ function PlotStorm2D( fnameInfo, dir1C, dir2A, dirWwlln, outPath, outFname )
 
     %%
     % Set the title and view
-    title(hAx, { sName; outFname; '/S1/Tc' }, ...
+
+    basinTitle = sBasin + sNum + ' ' + sName + ' at ' + synopticTime;
+    sensorTitle = "GPM GMI 89pct at " + passtimeDateStr;
+
+    title(hAx, { basinTitle; sensorTitle }, ...
           'Interpreter', 'None', 'FontSize', 20,'FontWeight','bold');
 
     view(0,90);
@@ -241,16 +258,19 @@ end
 
 
 %% 1c plot info getter fn
-function [latInRange,lonInRange,tc89V] = GetPlotInfo(inFile1c, plotRange)
+function [latInRange,lonInRange,pct89] = GetPlotInfo(inFile1c, plotRange)
 
     % read 1C S1 lat and lon
     lat = h5read(inFile1c,'/S1/Latitude');
     lon = h5read(inFile1c,'/S1/Longitude');
 
-    % read tc 89V from tc
+    % read tc and calc PCT
     tc89V = zeros(size(lon));
+    tc89H = zeros(size(lon));
     tc = h5read(inFile1c,'/S1/Tc');
     tc89V(:,:) = tc(8,:,:);
+    tc89H(:,:) = tc(9,:,:);
+    pct89 = 1.818 .* tc89V - 0.818 .* tc89H;
 
     % plot range
     minlat = plotRange(1);
@@ -274,10 +294,10 @@ function [latInRange,lonInRange,tc89V] = GetPlotInfo(inFile1c, plotRange)
     % get data in plot range
     latInRange = lat(:,inRange);
     lonInRange = lon(:,inRange);
-    tc89V = tc89V(:,inRange);
+    pct89 = pct89(:,inRange);
 
     % trim extreme high temp
-    tc89V(tc89V > 265) = NaN;
+    pct89(pct89 > 265) = NaN;
 
 end
 
