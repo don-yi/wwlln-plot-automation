@@ -28,14 +28,6 @@ function PlotStorm2D( fnameInfo, dir1C, dirWwlln, outPath, outFname )
     synopticTime = datestr(infoStruct.synoptic_time, 'yyyy-mm-dd HH:MM:ss');
     passtimeDateStr = datestr(passtimeDN, 'yyyy-mm-dd HH:MM:ss');
 
-    % passtimeTitle1 = insertAfter(passtimeSubstr,[4,6],'-');
-    % newStr = insertAfter(str,[5;4],[" Clerk";" Friedrich"])
-    % newStr = insertAfter(str,5," Clerk")
-    % newChr = strrep(chr,'quick','sly')
-
-    % passtimeDateTime = datetime(passtimeSubstr, ...
-    %                             'InputFormat', 'yyyymmdd_HHMMss');
-    % passtimeDateStr = datestr(passtimeDateTime, 'yyyy-mm-dd HH:MM:ss');
 
     %%
     % world map and label
@@ -57,6 +49,7 @@ function PlotStorm2D( fnameInfo, dir1C, dirWwlln, outPath, outFname )
     % Draw world map in black line with the equator
     z = zeros(size(world(:,1)));
     plot3(world(:,1),world(:,2),z,'k-','LineWidth',1.0);
+    grid on;
 
     hold on;
 
@@ -114,13 +107,17 @@ function PlotStorm2D( fnameInfo, dir1C, dirWwlln, outPath, outFname )
     xlim([xMin xMax]);
     ylim([yMin yMax]);
     caxis([min_data max_data]);
+    set(gca, 'FontSize',20);
+    xlabel('Latitude (°)', 'FontSize',18);
+    ylabel('Longitude (°)', 'FontSize',18);
 
     % overlapping the original colorbar
     hAx=gca;                     % save axes handle main axes
     h=colorbar('Location','southoutside', ...
-        'Position',[0.15 0.1 0.7 0.02]);% add colorbar, save its handle
+        'Position',[0.15 0.1 0.7 0.02]); % add colorbar, save its handle
+    h.FontSize = 16;
     h.XAxisLocation = 'bottom';
-    xlabel(h,'TB (K)','HorizontalAlignment','center');
+    xlabel(h, 'TB (K)', 'HorizontalAlignment','center', 'FontSize',16);
 
     % Set current back to the main one (done manually so that the other
     % properties such as visibility are not affected).
@@ -189,10 +186,10 @@ function PlotStorm2D( fnameInfo, dir1C, dirWwlln, outPath, outFname )
     % scatter on 2D
     scatter( ...
         lonWwlln, latWwlln, ...
-        16, ...
-        'black', ...
+        50, ...
+        'yellow', ...
         'filled', ...
-        'LineWidth', .05, ...
+        'LineWidth', 2, ...
         'MarkerEdgeColor', 'black' ...
     );
 
@@ -220,6 +217,7 @@ end
 function [fnameData1,fnameData2] = FindSatelliteFname(dirPath, timeFrom, timeTo)
 
     files = dir(fullfile(dirPath, '*.RT-H5')); % gets all files in struct
+    % files = dir(fullfile(dirPath, '*.HDF5')); % gets all files in struct
     for index = 1:length(files)
 
         % get str to parse time
@@ -265,11 +263,12 @@ function [latInRange,lonInRange,pct89] = GetPlotInfo(inFile1c, plotRange)
     lon = h5read(inFile1c,'/S1/Longitude');
 
     % read tc and calc PCT
-    tc89V = zeros(size(lon));
-    tc89H = zeros(size(lon));
     tc = h5read(inFile1c,'/S1/Tc');
+    tc89V = zeros(size(lon));
     tc89V(:,:) = tc(8,:,:);
+    tc89H = zeros(size(lon));
     tc89H(:,:) = tc(9,:,:);
+    pct89 = zeros(size(lon));
     pct89 = 1.818 .* tc89V - 0.818 .* tc89H;
 
     % plot range

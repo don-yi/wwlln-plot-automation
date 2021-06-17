@@ -1,0 +1,29 @@
+aid_type: BEST
+bounding_box:
+  image_height: 1400
+  image_width: 1400
+  maxlat: -3.7049740396737287
+  maxlon: 53.495025960326274
+  minlat: -16.29502596032627
+  minlon: 40.90497403967373
+  pixel_height_m: 1000.0
+  pixel_width_m: 1000.0
+  proj4_string: +proj=eqc +lat_ts=0 +lat_0=-10 +lon_0=47.2 +x_0=0 +y_0=0 +R=6371228
+    +units=m +no_defs +type=crs
+clat: -10.0
+clon: 47.2
+deck_line: SH,29,2021042118,,BEST,0,-10.0,47.2,50,999,TS,34,NEQ,40,40,35,35,50,NEQ,20,20,20,20,64,AAA,,,,,1011,80,10,,,S,,,,,JOBO,M,,,,,,
+final_storm_name: JOBO
+invest_number: 95
+original_source_filename: 1B.GPM.GMI.TB2016.20210421-S183519-E184017.V05A.RT-H5
+parser_name: gdeck_parser
+pressure: 999.0
+product_filename: /SATPRODUCTS/TC/tc2021/SH/SH292021/png/89pct/GPM/20210421_183328_SH292021_gmi_GPM_89pct_50kts_9p71_1p0.png
+source_filename: /gpfs/fs1/satuser/geoips_outdirs/satops/longterm_files/atcf/decks/Gsh292021.dat
+source_sector_file: /gpfs/fs1/satuser/geoips_outdirs/satops/longterm_files/atcf/decks/Gsh292021.dat
+storm_basin: SH
+storm_name: JOBO
+storm_num: 29
+storm_year: 2021
+synoptic_time: 2021-04-21 18:00:00
+vmax: 50.0
