@@ -108,8 +108,8 @@ function PlotStorm2D( fnameInfo, dir1C, dirWwlln, outPath, outFname )
     ylim([yMin yMax]);
     caxis([min_data max_data]);
     set(gca, 'FontSize',20);
-    xlabel('Latitude (°)', 'FontSize',18);
-    ylabel('Longitude (°)', 'FontSize',18);
+    xlabel('Longitude', 'FontSize',18);
+    ylabel('Latitude', 'FontSize',18);
 
     % overlapping the original colorbar
     hAx=gca;                     % save axes handle main axes
@@ -199,7 +199,7 @@ function PlotStorm2D( fnameInfo, dir1C, dirWwlln, outPath, outFname )
     %%
     % Set the title and view
 
-    basinTitle = sBasin + sNum + ' ' + sName + ' at ' + synopticTime;
+    basinTitle = sBasin + sNum + ' ' + sName + ' at ' + synopticTime + ', UW, DigiPen, NWRA';
     sensorTitle = "GPM GMI 89pct at " + passtimeDateStr;
 
     title(hAx, { basinTitle; sensorTitle }, ...
