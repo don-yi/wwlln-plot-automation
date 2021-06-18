@@ -33,22 +33,15 @@ function PlotStorm2D( fnameInfo, dir1C, dirWwlln, outPath, outFname )
     % world map and label
 
     % Create a figure
-    bgColor = [0.95 0.95 0.95];
-    figure( ...
-        'Color',bgColor,'Position',[0 0 1024 1024],'visible','off' ...
-    );
-
-    % Create a figure
-    f=figure('Color',    bgColor,         ...
-             'Position', [0 0 1024 1024], ...
-             'visible',  'off');
+    figure('Color',    [0.95 0.95 0.95], ...
+           'Position', [0 0 1024 1024],  ...
+           'visible',  'off');
 
     % Load and plot the world map first
     load('Map.mat');
 
     % Draw world map in black line with the equator
-    z = zeros(size(world(:,1)));
-    plot3(world(:,1),world(:,2),z,'k-','LineWidth',1.0);
+    plot(world(:,1),world(:,2),'k-','LineWidth',1.0);
     grid on;
 
     hold on;
@@ -87,13 +80,15 @@ function PlotStorm2D( fnameInfo, dir1C, dirWwlln, outPath, outFname )
     end
 
     % plot 1C w/ data found
+    % imgaussfilt([lon_inRange lat_inRange pct89]);
     pcolorCentered_old(lon_inRange,lat_inRange,pct89);
+    % imgaussfilt(pct89,2);
 
 
     %%
     % Setup the Colormap and graph limits
     colormap(flipud(jet(64)));
-    % TODO: smooth but less accurate
+    box on;
     % shading interp;
 
     min_data=120;
@@ -114,7 +109,7 @@ function PlotStorm2D( fnameInfo, dir1C, dirWwlln, outPath, outFname )
     % overlapping the original colorbar
     hAx=gca;                     % save axes handle main axes
     h=colorbar('Location','southoutside', ...
-        'Position',[0.15 0.1 0.7 0.02]); % add colorbar, save its handle
+               'Position',[0.14 0.085 0.7 0.02]); % add colorbar, save its handle
     h.FontSize = 16;
     h.XAxisLocation = 'bottom';
     xlabel(h, 'TB (K)', 'HorizontalAlignment','center', 'FontSize',16);
@@ -132,80 +127,83 @@ function PlotStorm2D( fnameInfo, dir1C, dirWwlln, outPath, outFname )
     set(findobj('Type', 'Figure'), 'Visible', 'off'); % Make all figures in this MATLAB workspace non-visible
     set(0, 'CurrentFigure', hGifFig); % Set the current figure of the workspace to the figure we will use to generate images.
 
-    %%
-    % Draw lightning
+    % %%
+    % % Draw lightning
 
-    % find .loc file from wwlln dir
-    % passtimeSubstr = fnameInfo(16:30);
-    dateWwlln = datenum(passtimeSubstr, 'yyyymmdd');
-    fnameWwlln = FindWwllnFname(dirWwlln, dateWwlln);
+    % % find .loc file from wwlln dir
+    % % passtimeSubstr = fnameInfo(16:30);
+    % dateWwlln = datenum(passtimeSubstr, 'yyyymmdd');
+    % fnameWwlln = FindWwllnFname(dirWwlln, dateWwlln);
 
-    % format for .loc files is
-    % year/month/day, hr:min:sec, latitude, longitude, error, number of stations
-    % 2013/11/07,00:00:00.181689, 23.7676, -86.0661, 13.0, 14
-    fidWwlln = fopen(fnameWwlln);
-    lightningData = textscan(fidWwlln,'%s %s %f %f %f %d','Delimiter',',');
-    fclose(fidWwlln);
+    % % format for .loc files is
+    % % year/month/day, hr:min:sec, latitude, longitude, error, number of stations
+    % % 2013/11/07,00:00:00.181689, 23.7676, -86.0661, 13.0, 14
+    % fidWwlln = fopen(fnameWwlln);
+    % lightningData = textscan(fidWwlln,'%s %s %f %f %f %d','Delimiter',',');
+    % fclose(fidWwlln);
 
-    % split time data field
-    lightningDateTime = append(lightningData{1}, lightningData{2});
-    lightningLat = lightningData{3};
-    lightningLon = lightningData{4};
+    % % split time data field
+    % lightningDateTime = append(lightningData{1}, lightningData{2});
+    % lightningLat = lightningData{3};
+    % lightningLon = lightningData{4};
 
-    % org as serial date num
-    lightningDN = datenum(lightningDateTime, 'yyyy/mm/ddHH:MM:SS');
+    % % org as serial date num
+    % lightningDN = datenum(lightningDateTime, 'yyyy/mm/ddHH:MM:SS');
 
-    % get passtime as serial date num
-    oneHour = datenum(0,0,0,1,0,0);
-    lightningTimeFrom = passtimeDN - oneHour;
-    lightningTimeTo = passtimeDN + oneHour;
+    % % get passtime as serial date num
+    % oneHour = datenum(0,0,0,1,0,0);
+    % lightningTimeFrom = passtimeDN - oneHour;
+    % lightningTimeTo = passtimeDN + oneHour;
 
-    % find ind during storm
-    indDuringStorm = find( ...
-        lightningTimeFrom <= lightningDN & lightningDN < lightningTimeTo);
+    % % find ind during storm
+    % indDuringStorm = find( ...
+    %     lightningTimeFrom <= lightningDN & lightningDN < lightningTimeTo);
 
-    % find all in geo & time range
-    latDuringStorm = lightningLat(indDuringStorm);
-    lonDuringStorm = lightningLon(indDuringStorm);
+    % % find all in geo & time range
+    % latDuringStorm = lightningLat(indDuringStorm);
+    % lonDuringStorm = lightningLon(indDuringStorm);
 
-    % % THIS IS NO DURING STORM BUT THE WHOLE DAY
-    % latDuringStorm = lightningLat;
-    % lonDuringStorm = lightningLon;
+    % % % THIS IS NO DURING STORM BUT THE WHOLE DAY
+    % % latDuringStorm = lightningLat;
+    % % lonDuringStorm = lightningLon;
 
-    % minlat = cCoord(1) - 11;
-    % maxlat = cCoord(1) + 11;
-    % minlon = cCoord(2) - 16;
-    % maxlon = cCoord(2) + 16;
-    idxInRange = find(minlat <= latDuringStorm & latDuringStorm <= maxlat ...
-                    & minlon <= lonDuringStorm & lonDuringStorm <= maxlon);
+    % % minlat = cCoord(1) - 11;
+    % % maxlat = cCoord(1) + 11;
+    % % minlon = cCoord(2) - 16;
+    % % maxlon = cCoord(2) + 16;
+    % idxInRange = find(minlat <= latDuringStorm & latDuringStorm <= maxlat ...
+    %                 & minlon <= lonDuringStorm & lonDuringStorm <= maxlon);
 
-    % pruning lat/lon arrays to ind of during and in storm
-    latWwlln = latDuringStorm(idxInRange);
-    lonWwlln = lonDuringStorm(idxInRange);
+    % % pruning lat/lon arrays to ind of during and in storm
+    % latWwlln = latDuringStorm(idxInRange);
+    % lonWwlln = lonDuringStorm(idxInRange);
 
-    % scatter on 2D
-    scatter( ...
-        lonWwlln, latWwlln, ...
-        50, ...
-        'yellow', ...
-        'filled', ...
-        'LineWidth', 2, ...
-        'MarkerEdgeColor', 'black' ...
-    );
+    % % scatter on 2D
+    % scatter( ...
+    %     lonWwlln, latWwlln, ...
+    %     50, ...
+    %     'yellow', ...
+    %     'filled', ...
+    %     'LineWidth', 2, ...
+    %     'MarkerEdgeColor', 'black' ...
+    % );
 
-    hold off;
+    % hold off;
 
 
     %%
     % Set the title and view
 
-    basinTitle = sBasin + sNum + ' ' + sName + ' at ' + synopticTime + ', UW, DigiPen, NWRA';
+    basinTitle = sBasin + sNum + ' ' + sName + ' at ' + synopticTime;
+    basinTitle = basinTitle + ', UW, DigiPen, NWRA';
     sensorTitle = "GPM GMI 89pct at " + passtimeDateStr;
 
-    title(hAx, { basinTitle; sensorTitle }, ...
-          'Interpreter', 'None', 'FontSize', 20,'FontWeight','bold');
-
-    view(0,90);
+    t = title(hAx, { basinTitle; sensorTitle }, ...
+              'Interpreter', 'None', ...
+              'FontSize',    20,     ...
+              'FontWeight',  'bold');
+    tPos = get(t, 'Position') + [0 0.4 0];
+    set(t,'Position', tPos);
 
     fullOutFname = fullfile(outPath, [outFname, '.jpg']); % gen full file name
     print(fullOutFname, '-djpeg'); % output to jpeg
@@ -216,8 +214,9 @@ end
 %% time matching hdf5 getter fn
 function [fnameData1,fnameData2] = FindSatelliteFname(dirPath, timeFrom, timeTo)
 
-    files = dir(fullfile(dirPath, '*.RT-H5')); % gets all files in struct
-    % files = dir(fullfile(dirPath, '*.HDF5')); % gets all files in struct
+    % gets all files in struct
+    files = dir(fullfile(dirPath, '*.RT-H5')); % NRT
+    % files = dir(fullfile(dirPath, '*.HDF5')); % Production
     for index = 1:length(files)
 
         % get str to parse time
@@ -268,7 +267,6 @@ function [latInRange,lonInRange,pct89] = GetPlotInfo(inFile1c, plotRange)
     tc89V(:,:) = tc(8,:,:);
     tc89H = zeros(size(lon));
     tc89H(:,:) = tc(9,:,:);
-    pct89 = zeros(size(lon));
     pct89 = 1.818 .* tc89V - 0.818 .* tc89H;
 
     % plot range
