@@ -80,9 +80,7 @@ function PlotStorm2D( fnameInfo, dir1C, dirWwlln, outPath, outFname )
     end
 
     % plot 1C w/ data found
-    % imgaussfilt([lon_inRange lat_inRange pct89]);
     pcolorCentered_old(lon_inRange,lat_inRange,pct89);
-    % imgaussfilt(pct89,2);
 
 
     %%
@@ -192,7 +190,7 @@ function PlotStorm2D( fnameInfo, dir1C, dirWwlln, outPath, outFname )
 
 
     %%
-    % Set the title and view
+    % Set the title
 
     basinTitle = sBasin + sNum + ' ' + sName + ' at ' + synopticTime;
     basinTitle = basinTitle + ', UW, DigiPen, NWRA';
@@ -207,6 +205,18 @@ function PlotStorm2D( fnameInfo, dir1C, dirWwlln, outPath, outFname )
 
     fullOutFname = fullfile(outPath, [outFname, '.jpg']); % gen full file name
     print(fullOutFname, '-djpeg'); % output to jpeg
+
+    % img = imread(fullOutFname);                   %create an image
+    % X = 235; Y = 200; W = 1000; H = 1000;             %where are we cropping?
+    % part_img = imcrop(img, [X, Y, W, H]);           %crop part out
+    % part_img_blur = imgaussfilt(part_img,8);
+    % img_blur = img;                   %you cannot put a color image inside grayscale, promote original to color
+    % img_blur(Y:Y+size(part_img,1)-1, X:X+size(part_img,2)-1, :) = part_img_blur;   %store the partial image back
+    % imwrite(img_blur, 'out/test.jpg');
+
+    % I = imread(fullOutFname);
+    % I = imgaussfilt(I,2);
+    % imwrite(I, 'out/test.jpg');
 
 end
 
