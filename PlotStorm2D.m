@@ -89,8 +89,8 @@ function PlotStorm2D( fnameInfo, dir1C, dirWwlln, outPath, outFname )
     box on;
     % shading interp;
 
-    min_data=120;
-    max_data=260;
+    min_data=180;
+    max_data=280;
 
     % setup axes limits for the plot and colorbar
     xMin = cCoord(2) - 6;
@@ -125,68 +125,68 @@ function PlotStorm2D( fnameInfo, dir1C, dirWwlln, outPath, outFname )
     set(findobj('Type', 'Figure'), 'Visible', 'off'); % Make all figures in this MATLAB workspace non-visible
     set(0, 'CurrentFigure', hGifFig); % Set the current figure of the workspace to the figure we will use to generate images.
 
-    % %%
-    % % Draw lightning
+    %%
+    % Draw lightning
 
-    % % find .loc file from wwlln dir
-    % % passtimeSubstr = fnameInfo(16:30);
-    % dateWwlln = datenum(passtimeSubstr, 'yyyymmdd');
-    % fnameWwlln = FindWwllnFname(dirWwlln, dateWwlln);
+    % find .loc file from wwlln dir
+    % passtimeSubstr = fnameInfo(16:30);
+    dateWwlln = datenum(passtimeSubstr, 'yyyymmdd');
+    fnameWwlln = FindWwllnFname(dirWwlln, dateWwlln);
 
-    % % format for .loc files is
-    % % year/month/day, hr:min:sec, latitude, longitude, error, number of stations
-    % % 2013/11/07,00:00:00.181689, 23.7676, -86.0661, 13.0, 14
-    % fidWwlln = fopen(fnameWwlln);
-    % lightningData = textscan(fidWwlln,'%s %s %f %f %f %d','Delimiter',',');
-    % fclose(fidWwlln);
+    % format for .loc files is
+    % year/month/day, hr:min:sec, latitude, longitude, error, number of stations
+    % 2013/11/07,00:00:00.181689, 23.7676, -86.0661, 13.0, 14
+    fidWwlln = fopen(fnameWwlln);
+    lightningData = textscan(fidWwlln,'%s %s %f %f %f %d','Delimiter',',');
+    fclose(fidWwlln);
 
-    % % split time data field
-    % lightningDateTime = append(lightningData{1}, lightningData{2});
-    % lightningLat = lightningData{3};
-    % lightningLon = lightningData{4};
+    % split time data field
+    lightningDateTime = append(lightningData{1}, lightningData{2});
+    lightningLat = lightningData{3};
+    lightningLon = lightningData{4};
 
-    % % org as serial date num
-    % lightningDN = datenum(lightningDateTime, 'yyyy/mm/ddHH:MM:SS');
+    % org as serial date num
+    lightningDN = datenum(lightningDateTime, 'yyyy/mm/ddHH:MM:SS');
 
-    % % get passtime as serial date num
-    % oneHour = datenum(0,0,0,1,0,0);
-    % lightningTimeFrom = passtimeDN - oneHour;
-    % lightningTimeTo = passtimeDN + oneHour;
+    % get passtime as serial date num
+    oneHour = datenum(0,0,0,1,0,0);
+    lightningTimeFrom = passtimeDN - oneHour;
+    lightningTimeTo = passtimeDN + oneHour;
 
-    % % find ind during storm
-    % indDuringStorm = find( ...
-    %     lightningTimeFrom <= lightningDN & lightningDN < lightningTimeTo);
+    % find ind during storm
+    indDuringStorm = find( ...
+        lightningTimeFrom <= lightningDN & lightningDN < lightningTimeTo);
 
-    % % find all in geo & time range
-    % latDuringStorm = lightningLat(indDuringStorm);
-    % lonDuringStorm = lightningLon(indDuringStorm);
+    % find all in geo & time range
+    latDuringStorm = lightningLat(indDuringStorm);
+    lonDuringStorm = lightningLon(indDuringStorm);
 
-    % % % THIS IS NO DURING STORM BUT THE WHOLE DAY
-    % % latDuringStorm = lightningLat;
-    % % lonDuringStorm = lightningLon;
+    % % THIS IS NO DURING STORM BUT THE WHOLE DAY
+    % latDuringStorm = lightningLat;
+    % lonDuringStorm = lightningLon;
 
-    % % minlat = cCoord(1) - 11;
-    % % maxlat = cCoord(1) + 11;
-    % % minlon = cCoord(2) - 16;
-    % % maxlon = cCoord(2) + 16;
-    % idxInRange = find(minlat <= latDuringStorm & latDuringStorm <= maxlat ...
-    %                 & minlon <= lonDuringStorm & lonDuringStorm <= maxlon);
+    % minlat = cCoord(1) - 11;
+    % maxlat = cCoord(1) + 11;
+    % minlon = cCoord(2) - 16;
+    % maxlon = cCoord(2) + 16;
+    idxInRange = find(minlat <= latDuringStorm & latDuringStorm <= maxlat ...
+                    & minlon <= lonDuringStorm & lonDuringStorm <= maxlon);
 
-    % % pruning lat/lon arrays to ind of during and in storm
-    % latWwlln = latDuringStorm(idxInRange);
-    % lonWwlln = lonDuringStorm(idxInRange);
+    % pruning lat/lon arrays to ind of during and in storm
+    latWwlln = latDuringStorm(idxInRange);
+    lonWwlln = lonDuringStorm(idxInRange);
 
-    % % scatter on 2D
-    % scatter( ...
-    %     lonWwlln, latWwlln, ...
-    %     50, ...
-    %     'yellow', ...
-    %     'filled', ...
-    %     'LineWidth', 2, ...
-    %     'MarkerEdgeColor', 'black' ...
-    % );
+    % scatter on 2D
+    scatter( ...
+        lonWwlln, latWwlln, ...
+        50, ...
+        'yellow', ...
+        'filled', ...
+        'LineWidth', 2, ...
+        'MarkerEdgeColor', 'black' ...
+    );
 
-    % hold off;
+    hold off;
 
 
     %%
@@ -303,8 +303,8 @@ function [latInRange,lonInRange,pct89] = GetPlotInfo(inFile1c, plotRange)
     lonInRange = lon(:,inRange);
     pct89 = pct89(:,inRange);
 
-    % trim extreme high temp
-    pct89(pct89 > 265) = NaN;
+    % % trim extreme high temp
+    % pct89(pct89 > 283) = NaN;
 
 end
 

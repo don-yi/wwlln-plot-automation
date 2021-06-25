@@ -26,9 +26,8 @@ map2=map1;
 map2(rows1+1,:)=NaN;
 map2(:,cols1+1)=NaN;
 
-% pct89(isnan(pct89)) = -1000;
 handle=pcolor(lg2, lt2, map2);
 
-% set(handle,'FaceColor','interp');
-% handle.CData = imgaussfilt(handle.CData);
+set(handle,'FaceColor','interp');
 set(handle,'EdgeColor','none');
+handle.CData(handle.CData > 283) = NaN;
