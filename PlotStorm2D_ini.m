@@ -1,18 +1,26 @@
+clear
+ScriptHeader;
+
 fnameInfo = ...
-'in/sector-info/20210311_174019_SH242021_gmi_GPM_89pct_125kts_7p50_1p0.png.yaml';
+    'in/sector-info/20210311_174019_SH242021_gmi_GPM_89pct_125kts_7p50_1p0.png.yaml';
 % fnameInfo = ...
-% 'in/sector-info/20210313_041146_SH242021_gmi_GPM_89pct_100kts_19p18_1p0.png.yaml';
+    % 'in/sector-info/20210313_041146_SH242021_gmi_GPM_89pct_100kts_19p18_1p0.png.yaml';
 % fnameInfo = ...
-% 'in/sector-info/20210316_162757_SH242021_gmi_GPM_89pctClean_30kts_5p03_1p0.png.yaml';
+    % 'in/sector-info/20210316_162757_SH242021_gmi_GPM_89pctClean_30kts_5p03_1p0.png.yaml';
 % fnameInfo = ...
-% 'in/sector-info/20210421_070447_SH292021_gmi_GPM_89pct_55kts_9p64_1p0.png.yaml';
+    % 'in/sector-info/20210421_070447_SH292021_gmi_GPM_89pct_55kts_9p64_1p0.png.yaml';
 % fnameInfo = ...
-% 'in/sector-info/20210421_183328_SH292021_gmi_GPM_89pct_50kts_9p71_1p0.png.yaml';
+    % 'in/sector-info/20210421_183328_SH292021_gmi_GPM_89pct_50kts_9p71_1p0.png.yaml';
 
-dir1C    = 'data-files-dir/1c/';
-dirWwlln = 'data-files-dir/wwlln/';
+dir1C             = 'data-files-dir/1c/';
+wwlln_data_path__ = 'data-files-dir/wwlln/';
 
-outPath  = 'out/';
-outFname = 'test-out-2D';
+% output_instances_list__ = containers.Map({'files', 'path'}, {{'ATL_20_13_Laura_Track_Map.jpg', 'ATL_20_13_Laura_Track_Map.jpg'}, '/wd3/storms/wwlln/data/processed_data/20/ATL/13/track_map'});
+output_instances_list__ = containers.Map( ... % {'files', 'path'}, ...
+    'test-out-2D.jpg', 'out/');
+output_name_pattern__ = 'test-out-2D';
 
-PlotStorm2D( fnameInfo, dir1C, dirWwlln, outPath, outFname )
+PlotStorm2D( ...
+    fnameInfo, ...
+    dir1C, wwlln_data_path__, ...
+    output_instances_list__, output_name_pattern__ )

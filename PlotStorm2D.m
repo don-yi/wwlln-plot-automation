@@ -1,4 +1,7 @@
-function PlotStorm2D( fnameInfo, dir1C, dirWwlln, outPath, outFname )
+function PlotStorm2D( ...
+    fnameInfo, ...
+    dir1C, wwlln_data_path__, ...
+    output_instances_list__, output_name_pattern__ )
 
     %% read plot info from sector info file
     % ref below link to download YAMLMATLAB & add to path
@@ -131,7 +134,7 @@ function PlotStorm2D( fnameInfo, dir1C, dirWwlln, outPath, outFname )
     % find .loc file from wwlln dir
     % passtimeSubstr = fnameInfo(16:30);
     dateWwlln = datenum(passtimeSubstr, 'yyyymmdd');
-    fnameWwlln = FindWwllnFname(dirWwlln, dateWwlln);
+    fnameWwlln = FindWwllnFname(wwlln_data_path__, dateWwlln);
 
     % format for .loc files is
     % year/month/day, hr:min:sec, latitude, longitude, error, number of stations
@@ -203,20 +206,10 @@ function PlotStorm2D( fnameInfo, dir1C, dirWwlln, outPath, outFname )
     tPos = get(t, 'Position') + [0 0.4 0];
     set(t,'Position', tPos);
 
-    fullOutFname = fullfile(outPath, [outFname, '.jpg']); % gen full file name
+    % gen full file name
+    outExt = output_name_pattern__ + ".jpg";
+    fullOutFname = fullfile(output_instances_list__(outExt), outExt);
     print(fullOutFname, '-djpeg'); % output to jpeg
-
-    % img = imread(fullOutFname);                   %create an image
-    % X = 235; Y = 200; W = 1000; H = 1000;             %where are we cropping?
-    % part_img = imcrop(img, [X, Y, W, H]);           %crop part out
-    % part_img_blur = imgaussfilt(part_img,8);
-    % img_blur = img;                   %you cannot put a color image inside grayscale, promote original to color
-    % img_blur(Y:Y+size(part_img,1)-1, X:X+size(part_img,2)-1, :) = part_img_blur;   %store the partial image back
-    % imwrite(img_blur, 'out/test.jpg');
-
-    % I = imread(fullOutFname);
-    % I = imgaussfilt(I,2);
-    % imwrite(I, 'out/test.jpg');
 
 end
 
@@ -309,10 +302,11 @@ function [latInRange,lonInRange,pct89] = GetPlotInfo(inFile1c, plotRange)
 end
 
 
+% TODO: GetLocFiles.m
 %% time matching .loc getter fn
-function fnameWwlln = FindWwllnFname(dirWwlln, dateWwlln)
+function fnameWwlln = FindWwllnFname(wwlln_data_path__, dateWwlln)
 
-    files = dir(fullfile(dirWwlln, '*.loc')); % gets all files in struct
+    files = dir(fullfile(wwlln_data_path__, '*.loc')); % gets all files in struct
     for index = 1:length(files)
 
         % get str to parse time
@@ -325,7 +319,7 @@ function fnameWwlln = FindWwllnFname(dirWwlln, dateWwlln)
 
         % find file in range
         if dateFile == dateWwlln
-            fnameWwlln = fullfile(dirWwlln, basefname);
+            fnameWwlln = fullfile(wwlln_data_path__, basefname);
             break;
         end
     end
