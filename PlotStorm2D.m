@@ -133,13 +133,18 @@ function PlotStorm2D( ...
 
     % find .loc file from wwlln dir
     % passtimeSubstr = fnameInfo(16:30);
+    % fnameWwlln = FindWwllnFname(wwlln_data_path__, dateWwlln);
     dateWwlln = datenum(passtimeSubstr, 'yyyymmdd');
-    fnameWwlln = FindWwllnFname(wwlln_data_path__, dateWwlln);
+    iYear    = datestr(dateWwlln, 'yyyy');
+    iMonth   = datestr(dateWwlln, 'mm');
+    iDay     = datestr(dateWwlln, 'dd');
+    locFiles = GetLocFiles(iYear, iMonth, iDay);
+    fullFnameWwlln = fullfile(locFiles.folder, locFiles.name);
 
-    % format for .loc files is
+    % format for .loc files is:
     % year/month/day, hr:min:sec, latitude, longitude, error, number of stations
     % 2013/11/07,00:00:00.181689, 23.7676, -86.0661, 13.0, 14
-    fidWwlln = fopen(fnameWwlln);
+    fidWwlln = fopen(fullFnameWwlln);
     lightningData = textscan(fidWwlln,'%s %s %f %f %f %d','Delimiter',',');
     fclose(fidWwlln);
 
@@ -302,25 +307,25 @@ function [latInRange,lonInRange,pct89] = GetPlotInfo(inFile1c, plotRange)
 end
 
 
-% TODO: GetLocFiles.m
-%% time matching .loc getter fn
-function fnameWwlln = FindWwllnFname(wwlln_data_path__, dateWwlln)
+%% REPLACED BY GetLocFiles.m
+% %% time matching .loc getter fn
+% function fnameWwlln = FindWwllnFname(wwlln_data_path__, dateWwlln)
 
-    files = dir(fullfile(wwlln_data_path__, '*.loc')); % gets all files in struct
-    for index = 1:length(files)
+%     files = dir(fullfile(wwlln_data_path__, '*.loc')); % gets all files in struct
+%     for index = 1:length(files)
 
-        % get str to parse time
-        basefname = files(index).name;
+%         % get str to parse time
+%         basefname = files(index).name;
 
-        % get date info from fname to serial date num
-        % Daily WWLLN data: e.g., A20131103.loc
-        baseSubstr = basefname(2:9);
-        dateFile = datenum(baseSubstr, 'yyyymmdd');
+%         % get date info from fname to serial date num
+%         % Daily WWLLN data: e.g., A20131103.loc
+%         baseSubstr = basefname(2:9);
+%         dateFile = datenum(baseSubstr, 'yyyymmdd');
 
-        % find file in range
-        if dateFile == dateWwlln
-            fnameWwlln = fullfile(wwlln_data_path__, basefname);
-            break;
-        end
-    end
-end
+%         % find file in range
+%         if dateFile == dateWwlln
+%             fnameWwlln = fullfile(wwlln_data_path__, basefname);
+%             break;
+%         end
+%     end
+% end
