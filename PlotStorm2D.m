@@ -223,15 +223,15 @@ end
 function [fnameData1,fnameData2] = FindSatelliteFname(dirPath, timeFrom, timeTo)
 
     % gets all files in struct
-    files = dir(fullfile(dirPath, '*.RT-H5')); % NRT
-    % files = dir(fullfile(dirPath, '*.HDF5')); % Production
+    files = dir(fullfile(dirPath, '*.HDF5')); % Production
     for index = 1:length(files)
 
         % get str to parse time
         basefname = files(index).name;
 
         % get date info from fname
-        % 1c.gpm.gmi.xcal2016-c.20210310-s011518-e012016.v05a.rt-h5
+        % 1C.GPM.GMI.XCAL2016-C.20210311-S173519-E174017.V05A.RT-H5
+        % 1C.GPM.GMI.XCAL2016-C.20210311-S162751-E180024.039965.V05A.HDF5
         y = str2double(basefname(23:26));
         m = str2double(basefname(27:28));
         d = str2double(basefname(29:30));
@@ -257,6 +257,45 @@ function [fnameData1,fnameData2] = FindSatelliteFname(dirPath, timeFrom, timeTo)
                 fnameData2 = fullfile(dirPath, basefname2);
             end
             break;
+        end
+    end
+
+    if fnameData1 == false
+        files = files + dir(fullfile(dirPath, '*.RT-H5')); % NRT
+        for index = 1:length(files)
+
+            % get str to parse time
+            basefname = files(index).name;
+
+            % get date info from fname
+            % 1C.GPM.GMI.XCAL2016-C.20210311-S173519-E174017.V05A.RT-H5
+            % 1C.GPM.GMI.XCAL2016-C.20210311-S162751-E180024.039965.V05A.HDF5
+            y = str2double(basefname(23:26));
+            m = str2double(basefname(27:28));
+            d = str2double(basefname(29:30));
+            starth  = str2double(basefname(33:34));
+            startmn = str2double(basefname(35:36));
+            starts  = str2double(basefname(37:38));
+            endh  = str2double(basefname(41:42));
+            endmn = str2double(basefname(43:44));
+            ends  = str2double(basefname(45:46));
+
+            % transfer to serial date num
+            starttime = datenum( y, m, d, starth, startmn, starts );
+            endtime   = datenum( y, m, d, endh,   endmn,   ends   );
+
+            % find file in range
+            if starttime <= timeFrom && timeFrom < endtime
+                fnameData1 = fullfile(dirPath, basefname);
+
+                % check if it's wrapping data
+                fnameData2 = false;
+                if timeTo > endtime
+                    basefname2 = files(index+1).name;
+                    fnameData2 = fullfile(dirPath, basefname2);
+                end
+                break;
+            end
         end
     end
 end
