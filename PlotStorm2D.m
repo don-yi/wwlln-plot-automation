@@ -1,6 +1,6 @@
 function PlotStorm2D( ...
     fnameInfo, ...
-    dir1C, wwlln_data_path__, ...
+    dir1C, ... % wwlln_data_path__, ...
     output_instances_list__, output_name_pattern__ )
 
     %% read plot info from sector info file
@@ -131,21 +131,70 @@ function PlotStorm2D( ...
     %%
     % Draw lightning
 
-    % find .loc file from wwlln dir
-    % passtimeSubstr = fnameInfo(16:30);
-    % fnameWwlln = FindWwllnFname(wwlln_data_path__, dateWwlln);
-    dateWwlln = datenum(passtimeSubstr, 'yyyymmdd');
-    iYear    = datestr(dateWwlln, 'yyyy');
-    iMonth   = datestr(dateWwlln, 'mm');
-    iDay     = datestr(dateWwlln, 'dd');
-    locFiles = GetLocFiles(iYear, iMonth, iDay);
+    % from Connor's SatOverlay.m:
+
+    % get passtime as serial date num
+    oneHour = datenum(0,0,0,1,0,0);
+    lightningTimeFrom = passtimeDN - oneHour;
+    lightningTimeTo   = passtimeDN + oneHour;
+    fileDateStart = datetime(lightningTimeFrom,'ConvertFrom','datenum');
+    fileDateEnd   = datetime(lightningTimeFrom,'ConvertFrom','datenum');
+
+    locFiles = [];
+    % Stores the upper bound datenum of the .loc files we have found thus far
+    % so that we can avoid pulling in multiple instances of the same AE file or
+    % pulling in A files that overlap with AE files.
+    dataDateEnd = datenum(0);
+    for iDate = fileDateStart:minutes(10):fileDateEnd
+        iDateNum = datenum(iDate);
+        % dateWwlln = datenum(passtimeSubstr, 'yyyymmdd');
+        % If the current date we have iterated to precedes the upper bound of
+        % the date of the data files we have found so far, move onto the next
+        % date.
+        if (iDateNum < dataDateEnd)
+            continue;
+        end
+        iYear    = datestr(iDateNum, 'yyyy');
+        iMonth   = datestr(iDateNum, 'mm');
+        iDay     = datestr(iDateNum, 'dd');
+        % iHour    = datestr(iDateNum, 'HH');
+        % iMinute  = datestr(iDateNum, 'MM');
+        tmpLocFiles = GetLocFiles(iYear, iMonth, iDay); % , iHour, iMinute);
+        if (size(tmpLocFiles, 1) > 0)
+            % If we found an AE file, move the upper-bound on our data up to
+            % the start of the next day so that we don't accidentally pull the
+            % same AE file or, somehow, and A files that would overlap with
+            % this AE file.
+            if (tmpLocFiles(1).name(1:2) == 'AE')
+              dataDateEnd = datenum(str2double(iYear),       ...
+                                    str2double(iMonth),      ...
+                                    (str2double(iDay) + 1));
+            else
+               % While this isn't technically representative of the actual
+               % upper-bound of the data we have pulled so far, it will be
+               % sufficient to prevent overlapping data being pulled and avoids
+               % the possability of excluding data due to rounding errors from
+               % converting using datenum.
+               dataDateEnd = iDateNum;
+            end
+        end
+        locFiles = [locFiles; tmpLocFiles];
+    end
+
     fullFnameWwlln = fullfile(locFiles.folder, locFiles.name);
 
-    % format for .loc files is:
+    fidWwlln = fopen(fullFnameWwlln);
+    lightningData = {};
+    % A:
     % year/month/day, hr:min:sec, latitude, longitude, error, number of stations
     % 2013/11/07,00:00:00.181689, 23.7676, -86.0661, 13.0, 14
-    fidWwlln = fopen(fullFnameWwlln);
-    lightningData = textscan(fidWwlln,'%s %s %f %f %f %d','Delimiter',',');
+    if locFiles.locFileType == 'A'
+        lightningData = textscan(fidWwlln,'%s %s %f %f %f %d','Delimiter',',');
+    % AE:
+    % 2021/3/11,00:00:01.549571, -42.8026, -057.0380, 27.6, 8, 1186.82, 211.85, 4
+    else
+        lightningData = textscan(fidWwlln,'%s %s %f %f %f %d %f %f %d','Delimiter',',');
+    end
     fclose(fidWwlln);
 
     % split time data field
@@ -156,10 +205,10 @@ function PlotStorm2D( ...
     % org as serial date num
     lightningDN = datenum(lightningDateTime, 'yyyy/mm/ddHH:MM:SS');
 
-    % get passtime as serial date num
-    oneHour = datenum(0,0,0,1,0,0);
-    lightningTimeFrom = passtimeDN - oneHour;
-    lightningTimeTo = passtimeDN + oneHour;
+    % % get passtime as serial date num
+    % oneHour = datenum(0,0,0,1,0,0);
+    % lightningTimeFrom = passtimeDN - oneHour;
+    % lightningTimeTo = passtimeDN + oneHour;
 
     % find ind during storm
     indDuringStorm = find( ...
